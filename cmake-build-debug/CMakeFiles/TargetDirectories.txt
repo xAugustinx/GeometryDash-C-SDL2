@@ -1,0 +1,3 @@
+/home/au/CLionProjects/GeometryDashSDL/cmake-build-debug/CMakeFiles/GeometryDashSDL.dir
+/home/au/CLionProjects/GeometryDashSDL/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/au/CLionProjects/GeometryDashSDL/cmake-build-debug/CMakeFiles/rebuild_cache.dir

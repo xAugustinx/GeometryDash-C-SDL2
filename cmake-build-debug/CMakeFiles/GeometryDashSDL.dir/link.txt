@@ -1,0 +1,1 @@
+/usr/bin/gcc -g -Wl,--dependency-file=CMakeFiles/GeometryDashSDL.dir/link.d CMakeFiles/GeometryDashSDL.dir/main.c.o -o GeometryDashSDL  /usr/lib/libSDL2main.a /usr/lib/libSDL2-2.0.so.0.3200.60 -lm
