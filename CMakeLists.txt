@@ -7,8 +7,3 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 target_link_libraries(GeometryDashSDL ${SDL2_LIBRARIES} m)
 
-#target_link_libraries(GeometryDashSDL
-#        SDL2::SDL2
-#SDL2_mixer::SDL2_mixer
-#)
-

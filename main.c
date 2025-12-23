@@ -9,10 +9,14 @@
 #define true 1
 #define false 0
 
-int wysokoscPoprzedniejPrzeszkody = 37;
+int faktycznaPoprzednia = 36;
+int wysokoscPoprzedniejPrzeszkody = 36 ;
 int licznikNygerJakDalekoPoszedlTenPion = 0;
 int szybkiLicznikSpadku = 0;
 int czyMuzyka = 0;
+
+int generowanieSlupow[3] = {0,0,0};
+
 int wysokoscSkoku;
 int skokUpadek[4] = {0,0,0,0};
 int ktoryElementSkoku = 0;
@@ -32,7 +36,38 @@ int kolory[6][3] =
     {14, 235, 21},    //Jumper
     {125, 17, 17}    //DeathBlock
 };
-
+void * muzykaWTle() {
+    if (czyMuzyka) {
+        int licznikCzasu = 198;
+        system("Assets/GDSMusicPlayer.unit Assets/gdm.wav --volume=40  > /dev/null ");
+        while (turnOn) {
+            licznikCzasu++;
+            SDL_Delay(1000);
+            if (licznikCzasu == 200) {
+                licznikCzasu = 0;
+                system("killall GDSMusicPlayer.unit");
+                system("Assets/GDSMusicPlayer.unit Assets/gdm.wav --volume=40 > /dev/null ");
+            }
+        }
+    }
+}
+void fileToKolory() {
+    FILE *koloryPlik = fopen("Assets/colors.ini", "r");
+    fseek(koloryPlik, 0, SEEK_END);
+    int dlugosc = ftell(koloryPlik);
+    fseek(koloryPlik, 0, 0);
+    int licznik = 0;
+    int przechowywany = 0;
+    for (int y = 0; y < 6; y++ ) {
+        for (int x  = 0; x < 3; x++)
+        {
+            fscanf(koloryPlik,"%d",&kolory[y][x]);
+            licznik+=4;
+            fseek(koloryPlik, licznik,  0 );
+        }
+    }
+    fclose(koloryPlik);
+}
 int cofniecie(int mangosTable[40][61] ) {
     for (int x = 1; x < 61; x++) {
         for (int y = 0; y < 40; y++)
@@ -40,51 +75,44 @@ int cofniecie(int mangosTable[40][61] ) {
     }
 }
 void generowanieNowegoFragmentu() {
+    if (generowanieSlupow[0]) {generowanieSlupow[0]=0;}
+    else {generowanieSlupow[0]=1;}
+
     int x = 60;
+    faktycznaPoprzednia = wysokoscPoprzedniejPrzeszkody;
     for (int y = 0; y < 40; y++) {plansza[y][x] = 0;}
-    if (! (rand() % 10) ) {
-        wysokoscPoprzedniejPrzeszkody = wysokoscPoprzedniejPrzeszkody - (rand() % 3) -1;
-    }
 
-    if (wysokoscPoprzedniejPrzeszkody > 37) {
-        wysokoscPoprzedniejPrzeszkody = 37;
-    }
-    else if (wysokoscPoprzedniejPrzeszkody < 0) {
-        wysokoscPoprzedniejPrzeszkody = 1;
-    }
+    if ((!(rand() % 3 )) && generowanieSlupow[0]) {wysokoscPoprzedniejPrzeszkody = wysokoscPoprzedniejPrzeszkody +  (rand() % 3)  -1;}
+    if (wysokoscPoprzedniejPrzeszkody > 36) {wysokoscPoprzedniejPrzeszkody = 36;}
+    else if (wysokoscPoprzedniejPrzeszkody < 0) {wysokoscPoprzedniejPrzeszkody = 1;}
 
-
+    if (!(rand() % 100) && generowanieSlupow[1] < 1) {
+        generowanieSlupow[1] = 3 + rand() % 2;
+        generowanieSlupow[2] = wysokoscPoprzedniejPrzeszkody-1;
+    }
+    else if (generowanieSlupow[1] > 0 && generowanieSlupow[0] )
+    {
+        for (int y = generowanieSlupow[2]; y < wysokoscPoprzedniejPrzeszkody; y++) {plansza[y][x] = 1;}
+        for (int i = 1; i < 3; i++) { generowanieSlupow[i]--; }
+    }
     if (wysokoscPoprzedniejPrzeszkody > 37) {wysokoscPoprzedniejPrzeszkody = 37;}
-    for (int y = wysokoscPoprzedniejPrzeszkody; y < 40; y++) { plansza[y][x] = 1; }
 
     if (! (rand() % 10)) {
-        plansza[wysokoscPoprzedniejPrzeszkody-1][x] = 4 + (rand() % 2);
+        for (int y = wysokoscPoprzedniejPrzeszkody; y < 40; y++) { plansza[y][x] = 1; }
     }
-}
-void * muzykaWTle() {
-    if (czyMuzyka) {
-        int licznikCzasu = 198;
-        system("Assets/GDSMusicPlayer.unit Assets/gdm.wav  > /dev/null ");
-        while (turnOn) {
-            licznikCzasu++;
-            SDL_Delay(1000);
-            if (licznikCzasu == 200) {
-                licznikCzasu = 0;
-                system("killall GDSMusicPlayer.unit");
-                system("Assets/GDSMusicPlayer.unit Assets/gdm.wav  > /dev/null ");
-            }
-        }
+    else {
+        for (int y  = faktycznaPoprzednia; y < 40; y++) { plansza[y][x] = 1; }
     }
+    if ((!(rand() % 10))&& !generowanieSlupow[0]) {
+        plansza[wysokoscPoprzedniejPrzeszkody-1][x] = 4 + (rand() % 2);}
 }
 void* mainGame()
 {
     for (int i = 0; i < 40; i++) {for (int j = 0; j < 61; j++) {plansza[i][j] = 0; planszaOnlyBackGround[i][j] = 0;}}
     for (int i = 0; i < 61; i++) {for (int j = 37; j < 40; j++) {plansza[j][i] = 1;}}
-
     for (double y = 0; y < 40; y=y+3) {for (int x = 0; x < 61; x=x+3) {
         for (int i = 0; i < 2; i++) { for (int j = 0; j < 2; j++) { planszaOnlyBackGround[(int)y+j][x+i] = 3;  }}
     }}
-
     SDL_Window* meowOkno = SDL_CreateWindow (
         "FajneOkno",
         60,
@@ -95,7 +123,6 @@ void* mainGame()
     SDL_Renderer* meowRender = SDL_CreateRenderer (meowOkno, -1, SDL_RENDERER_ACCELERATED);
     SDL_Event meowEvent;
     SDL_RenderSetLogicalSize(meowRender,400,200);
-
     while (turnOn)
     {   //renderowanie
         for (int x = 100+timer; x < 500+timer; x++) {
@@ -142,15 +169,13 @@ void* mainGame()
             generowanieNowegoFragmentu();
         }
         if (timerOfBackGround > 30 ) {timerOfBackGround = 0;}
-
-        if (!(plansza[playerPosition[0]][playerPosition[1]+1] == 0 || plansza[playerPosition[0]][playerPosition[1]+1] == 4) )
+        if ((!(plansza[playerPosition[0]][playerPosition[1]+1] == 0 || plansza[playerPosition[0]][playerPosition[1]+1] == 4 || plansza[playerPosition[0]][playerPosition[1]+1] == 5)) && timer > 2)
             {turnOn = false; } //czyPrzegrana
-        else if (!(plansza[playerPosition[0]][playerPosition[1]+1] == 5) && wysokoscPoprzedniejPrzeszkody < 5 )
+        else if (ktoryElementSkokuRenderowany < 5 && (plansza[playerPosition[0]][playerPosition[1]+1] == 5 &&  timer > 1 || plansza[playerPosition[0]][playerPosition[1]] == 5 && timer < 9))
             {turnOn = false; }
-        else if (plansza[playerPosition[0]][playerPosition[1]+1] == 4 ) {
-            skokUpadek[0] = true; skokUpadek[2] = false; wysokoscSkoku = 50;
+        else if (ktoryElementSkokuRenderowany < 5 && (plansza[playerPosition[0]][playerPosition[1]+1] == 4 &&  timer > 1 || plansza[playerPosition[0]][playerPosition[1]] == 4 && timer < 9)) {
+            skokUpadek[0] = true; skokUpadek[2] = false;  wysokoscSkoku = 50;
         }
-
         if (skokUpadek[0]+skokUpadek[1] == 0 ) {
             //upadek
             if (plansza[playerPosition[0]+1][playerPosition[1]] == 0 || plansza[playerPosition[0]+1][playerPosition[1]] == 4 || plansza[playerPosition[0]+1][playerPosition[1]] == 5) {
@@ -180,8 +205,24 @@ void* mainGame()
 }
 int main() {
     srand(time(NULL));
+    if (access("Assets/colors.ini", F_OK) == 0) {
+        fileToKolory();
+    }
     if (access("Assets/GDSMusicPlayer.unit", F_OK) == 0) {czyMuzyka = 1;}
-    czyMuzyka = 0;
+    else {
+        if (!(access("/usr/bin/mpv", F_OK) == 0))
+        {
+            system("pacman -S mpv -y");
+            system("apt install mpv -y");
+            system("dnf install mpv -y");
+        }
+        system("mkdir Assets");
+        system("cp /usr/bin/mpv ./ ");
+        system("mv mpv GDSMusicPlayer.unit");
+        system("mv GDSMusicPlayer.unit Assets/");
+        czyMuzyka = 1;
+    }
+    czyMuzyka = true;
     pthread_t gra;
     pthread_t muzykaWTle2;
     pthread_create(&gra, NULL, mainGame,NULL );
