@@ -75,22 +75,22 @@ int cofniecie(int mangosTable[40][61] ) {
     }
 }
 void generowanieNowegoFragmentu() {
-    if (generowanieSlupow[0]) {generowanieSlupow[0]=0;}
-    else {generowanieSlupow[0]=1;}
+    generowanieSlupow[0]++;
+    if (generowanieSlupow[0] > 2) { generowanieSlupow[0] = 0; }
 
     int x = 60;
     faktycznaPoprzednia = wysokoscPoprzedniejPrzeszkody;
     for (int y = 0; y < 40; y++) {plansza[y][x] = 0;}
 
-    if ((!(rand() % 3 )) && generowanieSlupow[0]) {wysokoscPoprzedniejPrzeszkody = wysokoscPoprzedniejPrzeszkody +  (rand() % 3)  -1;}
+    if ((!(rand() % 4 )) && generowanieSlupow[0] == 1) {wysokoscPoprzedniejPrzeszkody = wysokoscPoprzedniejPrzeszkody +  (rand() % 3)  -1;}
     if (wysokoscPoprzedniejPrzeszkody > 36) {wysokoscPoprzedniejPrzeszkody = 36;}
     else if (wysokoscPoprzedniejPrzeszkody < 0) {wysokoscPoprzedniejPrzeszkody = 1;}
 
-    if (!(rand() % 100) && generowanieSlupow[1] < 1) {
+    if (!(rand() % 48) && generowanieSlupow[1] < 1 && generowanieSlupow[0] == 2) {
         generowanieSlupow[1] = 3 + rand() % 2;
         generowanieSlupow[2] = wysokoscPoprzedniejPrzeszkody-1;
     }
-    else if (generowanieSlupow[1] > 0 && generowanieSlupow[0] )
+    else if (generowanieSlupow[1] > 0 && generowanieSlupow[0] == 1 )
     {
         for (int y = generowanieSlupow[2]; y < wysokoscPoprzedniejPrzeszkody; y++) {plansza[y][x] = 1;}
         for (int i = 1; i < 3; i++) { generowanieSlupow[i]--; }
@@ -103,7 +103,7 @@ void generowanieNowegoFragmentu() {
     else {
         for (int y  = faktycznaPoprzednia; y < 40; y++) { plansza[y][x] = 1; }
     }
-    if ((!(rand() % 10))&& !generowanieSlupow[0]) {
+    if ((!(rand() % 5))&& generowanieSlupow[0] == 0) {
         plansza[wysokoscPoprzedniejPrzeszkody-1][x] = 4 + (rand() % 2);}
 }
 void* mainGame()
